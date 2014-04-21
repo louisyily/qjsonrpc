@@ -30,11 +30,12 @@ class QJsonRpcMessagePrivate : public QSharedData
 public:
     QJsonRpcMessagePrivate();
     ~QJsonRpcMessagePrivate();
+    QJsonRpcMessagePrivate(const QJsonRpcMessagePrivate &other);
 
     void initializeWithObject(const QJsonObject &message);
     static QJsonRpcMessage createBasicRequest(const QString &method, const QVariantList &params);
     QJsonRpcMessage::Type type;
-    QJsonObject *object;
+    QScopedPointer<QJsonObject> object;
 
     static int uniqueRequestCounter;
 
@@ -47,9 +48,16 @@ QJsonRpcMessagePrivate::QJsonRpcMessagePrivate()
 {
 }
 
+QJsonRpcMessagePrivate::QJsonRpcMessagePrivate(const QJsonRpcMessagePrivate &other)
+    : QSharedData(other),
+      type(other.type),
+      object(other.object ? new QJsonObject(*other.object) : 0)
+{
+}
+
 void QJsonRpcMessagePrivate::initializeWithObject(const QJsonObject &message)
 {
-    object = new QJsonObject(message);
+    object.reset(new QJsonObject(message));
     if (message.contains("id")) {
         if (message.contains("result") || message.contains("error")) {
             if (message.contains("error"))
@@ -69,14 +77,12 @@ void QJsonRpcMessagePrivate::initializeWithObject(const QJsonObject &message)
 
 QJsonRpcMessagePrivate::~QJsonRpcMessagePrivate()
 {
-    if (object)
-        delete object;
 }
 
 QJsonRpcMessage::QJsonRpcMessage()
     : d(new QJsonRpcMessagePrivate)
 {
-    d->object = new QJsonObject;
+    d->object.reset(new QJsonObject);
 }
 
 QJsonRpcMessage::QJsonRpcMessage(const QJsonRpcMessage &other)
@@ -163,7 +169,6 @@ QJsonRpcMessage::Type QJsonRpcMessage::type() const
 QJsonRpcMessage QJsonRpcMessagePrivate::createBasicRequest(const QString &method, const QVariantList &params)
 {
     QJsonRpcMessage request;
-    request.d->object = new QJsonObject;
     request.d->object->insert("jsonrpc", QLatin1String("2.0"));
     request.d->object->insert("method", method);
     if (!params.isEmpty())
@@ -201,12 +206,11 @@ QJsonRpcMessage QJsonRpcMessage::createResponse(const QVariant &result) const
 {
     QJsonRpcMessage response;
     if (d->object->contains("id")) {
-        QJsonObject *object = new QJsonObject;
+        QJsonObject *object = response.d->object.data();
         object->insert("jsonrpc", QLatin1String("2.0"));
         object->insert("id", d->object->value("id"));
         object->insert("result", QJsonValue::fromVariant(result));
         response.d->type = QJsonRpcMessage::Response;
-        response.d->object = object;
     }
 
     return response;
@@ -223,7 +227,7 @@ QJsonRpcMessage QJsonRpcMessage::createErrorResponse(QJsonRpc::ErrorCode code, c
         error.insert("data", QJsonValue::fromVariant(data));
 
     response.d->type = QJsonRpcMessage::Error;
-    QJsonObject *object = new QJsonObject;
+    QJsonObject *object = response.d->object.data();
     object->insert("jsonrpc", QLatin1String("2.0"));
 
     if (d->object->contains("id"))
@@ -231,7 +235,6 @@ QJsonRpcMessage QJsonRpcMessage::createErrorResponse(QJsonRpc::ErrorCode code, c
     else
         object->insert("id", 0);
     object->insert("error", error);
-    response.d->object = object;
     return response;
 }
 
