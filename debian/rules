@@ -4,4 +4,9 @@ include /usr/share/cdbs/1/rules/debhelper.mk
 include /usr/share/cdbs/1/class/qmake.mk
 
 DEB_QMAKE_ARGS = "PREFIX=/usr/local"
-DEB_SHLIBDEPS_INCLUDE = /opt/Qt5.8.0/5.8/gcc_64/lib
+
+#FIXME: Dummy fix for Faraadid package: fd-qt
+DEB_DH_SHLIBDEPS_ARGS_ALL = --ignore-missing-info
+#TODO: generate shlibS files in the fd-qt package, 
+# SO *.shlibs files will be available (under /var/lib/dpkg/info/*.shlibs)
+#DEB_SHLIBDEPS_INCLUDE = /opt/Qt5.8.0/5.8/gcc_64/lib
