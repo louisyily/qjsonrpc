@@ -1,6 +1,7 @@
 Source: qjsonrpc
 Section: libs
 Priority: extra
+Uploaders: Navid Khazaee (nkhdiscovery) <navid.khazaee@gmail.com>
 Maintainer: Devon IT Developers <development@devonit.com>
 Build-Depends: fd-qt (>= 5.6.0),
                cdbs (>= 0.4.41),
