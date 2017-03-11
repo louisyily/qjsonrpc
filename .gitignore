@@ -17,6 +17,7 @@ debian/libqjsonrpc/
 debian/stamp-makefile-build
 debian/stamp-makefile-install
 debian/tmp/
+debian/files
 src/libqjsonrpc.prl
 src/moc_predefs.h
 src/moc_qjsonrpchttpclient.cpp
