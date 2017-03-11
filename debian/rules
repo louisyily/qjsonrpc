@@ -4,6 +4,4 @@ include /usr/share/cdbs/1/rules/debhelper.mk
 include /usr/share/cdbs/1/class/qmake.mk
 
 DEB_QMAKE_ARGS = "PREFIX=/usr/local"
-
-override_dh_shlibdeps:
-	    dh_shlibdeps -l/opt/Qt5.8.0/5.8/gcc_64/lib
+DEB_SHLIBDEPS_INCLUDE = /opt/Qt5.8.0/5.8/gcc_64/lib
