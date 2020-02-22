@@ -33,6 +33,7 @@ Building
     mkdir build
     cd build
     qmake .. && make install
+    
     ---add---
     sudo ln -s ~/Qt5.13.1/5.13.1/gcc_64/bin/qmake /usr/lib/x86_64-linux-gnu/qt4/bin/qmake
     sudo su
